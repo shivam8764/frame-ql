@@ -1,37 +1,37 @@
 name: frame-ql Python CI
 
 on:
-push:
-branches: [ "main" ] # Runs on pushes to the main branch
-pull_request:
-branches: [ "main" ] # Runs on pull requests targeting the main branch
+  push:
+    branches: [ "main" ] # Runs on pushes to the main branch
+  pull_request:
+    branches: [ "main" ] # Runs on pull requests targeting the main branch
 
 jobs:
-build:
-runs-on: ubuntu-latest # The type of machine to run the job on
-strategy:
-matrix:
-python-version: ["3.9", "3.10", "3.11"] # Test against multiple Python versions
+  build:
+    runs-on: ubuntu-latest # The type of machine to run the job on
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"] # Test against multiple Python versions
 
-steps:
-  # 1. Checks out your repository's code
-  - name: Check out repository
-    uses: actions/checkout@v3
+    steps:
+      # 1. Checks out your repository's code
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-  # 2. Sets up the specified version of Python
-  - name: Set up Python ${{ matrix.python-version }}
-    uses: actions/setup-python@v4
-    with:
-      python-version: ${{ matrix.python-version }}
-      cache: 'poetry'
+      # 2. Sets up the specified version of Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
 
-  # 3. Installs Poetry and your project's dependencies
-  - name: Install dependencies
-    run: |
-      pip install poetry
-      poetry install
+      # 3. Installs Poetry and your project's dependencies
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install
 
-  # 4. Runs the tests using pytest
-  - name: Run tests with pytest
-    run: |
-      poetry run pytest
+      # 4. Runs the tests using pytest
+      - name: Run tests with pytest
+        run: |
+          poetry run pytest
