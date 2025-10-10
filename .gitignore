@@ -1,0 +1,23 @@
+# --- Python ---
+# Compiled bytecode and cache
+__pycache__/
+*.pyc
+
+# Poetry / Hatch / Pip
+.poetry/
+.hatch/
+*.lock
+
+# --- OS-specific ---
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# --- IDEs & Editors ---
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/

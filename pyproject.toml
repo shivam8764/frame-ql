@@ -1,0 +1,28 @@
+[project]
+name = "frame-ql"
+version = "0.1.0"
+description = "A mini SQL-like data engine from scratch that supports parsing CSV files, storing data in our own DataFrame class, and providing fundamental operations: filtering, projection, group-by, aggregation, and join.."
+authors = [
+    {name = "Darshan Nilesh Mahajan, Shivam Kumar"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+]
+
+packages = [{include = "frame_ql", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = [
+"src"
+]
