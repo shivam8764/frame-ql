@@ -18,18 +18,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 2. Sets up the specified version of Python
+      # 2. Installs Poetry and your project's dependencies
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          python -m poetry install
+
+      # 3. Sets up the specified version of Python
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'poetry'
-
-      # 3. Installs Poetry and your project's dependencies
-      - name: Install dependencies
-        run: |
-          pip install poetry
-          python -m poetry install
 
       # 4. Runs the tests using pytest
       - name: Run tests with pytest
