@@ -18,20 +18,24 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 2. Installs Poetry and your project's dependencies
-      - name: Install dependencies
-        run: |
-          pip install poetry
-          python -m poetry install
-
-      # 3. Sets up the specified version of Python
+      # 2. Sets up the specified version of Python
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'poetry'
 
-      # 4. Runs the tests using pytest
+      # 3. Use the dedicated action to install Poetry
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      # 4. Install poetry and run the tests using pytest
+      - name: Install dependencies
+        run: poetry install
+
       - name: Run tests with pytest
-        run: |
-          python -m poetry run pytest
+        run: poetry run pytest
