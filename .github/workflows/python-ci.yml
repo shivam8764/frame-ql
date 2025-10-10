@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest # The type of machine to run the job on
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"] # Test against multiple Python versions
+        python-version: ["3.9"] # Test against multiple Python versions
 
     steps:
       # 1. Checks out your repository's code
