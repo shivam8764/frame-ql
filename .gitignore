@@ -6,7 +6,6 @@ __pycache__/
 # Poetry / Hatch / Pip
 .poetry/
 .hatch/
-*.lock
 
 # --- OS-specific ---
 # macOS
