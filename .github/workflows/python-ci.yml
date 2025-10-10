@@ -1,8 +1,5 @@
-This is a GitHub Actions workflow file that defines your CI pipeline.
-It will automatically run your tests on every push and pull request.
-name: Python CI
+name: frame-ql Python CI
 
-Controls when the workflow will run
 on:
 push:
 branches: [ "main" ] # Runs on pushes to the main branch
