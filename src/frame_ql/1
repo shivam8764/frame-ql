@@ -1,0 +1,137 @@
+import textwrap
+from collections import defaultdict
+from statistics import mean
+
+class DataFrame:
+    """A 2D labeled table like data structure
+    
+    Properties:
+        shape: Returns the dimensionality of (rows, columns)
+        columns: Returns the column labels of DataFrame
+    """
+
+    def __init__(self, data):
+        """Initializes dataframe
+
+        Args:
+            data (dict): a dictionary where keys are the column names and
+                         values are the list of column data.
+        """
+        if not isinstance(data, dict):
+            raise TypeError("Input data should be a dictionary.")
+        
+        processed_data = {k: list(v) for k, v in data.items()}
+        
+        list_lengths = iter(len(v) for v in processed_data.values())
+        first_len = next(list_lengths, None)
+        if not all(l == first_len for l in list_lengths):
+            raise ValueError("All column lists must be of same length.")
+        
+        self._data = processed_data
+        self._columns = list(processed_data.keys())
+
+    # -------------------- BASIC PROPERTIES -------------------- #
+    @property
+    def shape(self):
+        num_rows = len(self._data[self._columns[0]]) if self._columns else 0
+        num_cols = len(self._columns)
+        return (num_rows, num_cols)
+
+    @property
+    def columns(self):
+        return self._columns
+
+    def head(self, n=5):
+        """Return a new DataFrame with first n rows."""
+        head_data = {col: val[:n] for col, val in self._data.items()}
+        return self.__class__(head_data)
+
+    def __repr__(self):
+        """Pretty print preview."""
+        num_rows, num_cols = self.shape
+        header = f"DataFrame Shape: ({num_rows},{num_cols})\n"
+        df_head = self.head()
+        col_str = " | ".join(f"{col:<15}" for col in df_head.columns)
+        header_line = "-" * len(col_str)
+        row_strs = []
+        for i in range(df_head.shape[0]):
+            row = [str(df_head._data[col][i]) for col in df_head.columns]
+            row_strs.append(" | ".join(f"{item:<15}" for item in row))
+        body = "\n".join(row_strs)
+        return f"{header}\n{col_str}\n{header_line}\n{body}"
+
+    # -------------------- GROUPBY + AGGREGATION -------------------- #
+    def groupby(self, by):
+        """Return a GroupBy helper bound to this DataFrame."""
+        return GroupBy(self, by)
+
+
+# -------------------- GROUPBY CLASS -------------------- #
+class GroupBy:
+    """GroupBy engine that works with column-based DataFrame."""
+
+    def __init__(self, dataframe, by):
+        self.df = dataframe
+        self.by = by if isinstance(by, list) else [by]
+
+    def aggregate(self, agg_dict):
+        """
+        Args:
+            agg_dict (dict): column -> aggregation type (sum, count, avg, min, max)
+
+        Returns:
+            DataFrame: new DataFrame with grouped + aggregated results
+        """
+        data = self.df._data
+        n_rows = self.df.shape[0]
+        grouped = defaultdict(lambda: defaultdict(list))
+
+        # 1️⃣ Build groups by key
+        for i in range(n_rows):
+            key = tuple(data[col][i] for col in self.by)
+            for col in self.df.columns:
+                grouped[key][col].append(data[col][i])
+
+        # 2️⃣ Compute aggregations
+        result_rows = {col: [] for col in (self.by + list(agg_dict.keys()))}
+
+        for key, cols in grouped.items():
+            # set grouping key columns
+            for i, by_col in enumerate(self.by):
+                result_rows[by_col].append(key[i])
+            
+            # perform aggregations
+            for col, agg_type in agg_dict.items():
+                result_rows[col].append(self._aggregate_column(cols[col], agg_type))
+
+        return DataFrame(result_rows)
+
+    def _aggregate_column(self, values, agg_type):
+        """Helper: compute a single column aggregation."""
+        clean_vals = []
+        for v in values:
+            if v is None or v == '':
+                continue
+            try:
+                v = float(v)
+            except ValueError:
+                pass
+            clean_vals.append(v)
+
+        if not clean_vals:
+            return None
+
+        agg_type = agg_type.lower()
+        if agg_type == 'sum':
+            return sum(v for v in clean_vals if isinstance(v, (int, float)))
+        elif agg_type == 'count':
+            return len(clean_vals)
+        elif agg_type == 'avg':
+            nums = [v for v in clean_vals if isinstance(v, (int, float))]
+            return round(mean(nums), 3)
+        elif agg_type == 'min':
+            return min(clean_vals)
+        elif agg_type == 'max':
+            return max(clean_vals)
+        else:
+            raise ValueError(f"Unsupported aggregation type: {agg_type}")
